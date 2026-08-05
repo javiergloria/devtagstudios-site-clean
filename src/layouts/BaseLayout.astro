@@ -10,7 +10,7 @@ const navLinks = [
 	{ href: '/', label: 'Home' },
 	{ href: '/beauty-glamour', label: 'Beauty & Glamour' },
 	{ href: '/boudoir-portraits', label: 'Boudoir Portraits' },
-	{ href: 'https://www.instagram.com/devtagstudiosut', label: 'Urban & Travel' },
+	{ href: 'https://devtag.com/urban-street-photography/', label: 'Urban & Travel', external: true },
 ];
 ---
 
@@ -40,7 +40,7 @@ const navLinks = [
 				</a>
 				<nav>
 					{navLinks.map((link) => (
-						<a href={link.href}>{link.label}</a>
+						<a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener noreferrer' : undefined}>{link.label}</a>
 					))}
 				</nav>
 			</div>
