@@ -22,6 +22,10 @@ const navLinks = [
 		<link rel="icon" type="image/png" href="/favicon.png" />
 		<meta name="generator" content={Astro.generator} />
 
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap" rel="stylesheet" />
+
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<meta property="og:title" content={title} />
@@ -88,5 +92,8 @@ const navLinks = [
 		max-width: 1200px;
 		margin: 0 auto;
 		padding: 0 1.5rem 4rem;
+	}
+	h1 {
+		font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
 	}
 </style>
