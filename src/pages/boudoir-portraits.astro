@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const photoCount = 19;
+const photos = Array.from({ length: photoCount }, (_, i) => {
+	const n = String(i + 1).padStart(2, '0');
+	return `/images/boudoir/photo-${n}.jpg`;
+});
+---
+
+<BaseLayout title="Boudoir Portraits | Devtag' Studios" description="Boudoir portrait photography by Devtag' Studios.">
+	<main>
+		<div class="gallery">
+			{photos.map((src, i) => (
+				<img src={src} alt={`Boudoir portrait ${i + 1}`} loading="lazy" />
+			))}
+		</div>
+	</main>
+</BaseLayout>
+
+<style>
+	.gallery {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+		gap: 0.5rem;
+		padding-top: 1rem;
+	}
+	.gallery img {
+		width: 100%;
+		height: 340px;
+		object-fit: cover;
+		display: block;
+	}
+</style>
