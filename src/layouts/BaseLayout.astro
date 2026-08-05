@@ -1,0 +1,90 @@
+---
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "Devtag' Studios" } = Astro.props;
+
+const navLinks = [
+	{ href: '/', label: 'Home' },
+	{ href: '/beauty-glamour', label: 'Beauty & Glamour' },
+	{ href: 'https://www.instagram.com/devtagstudiosut', label: 'Urban & Travel' },
+];
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta name="twitter:card" content="summary_large_image" />
+	</head>
+	<body>
+		<header>
+			<div class="header-inner">
+				<a class="logo" href="/">
+					<img src="/images/logo.png" alt="Devtag' Studios" />
+				</a>
+				<nav>
+					{navLinks.map((link) => (
+						<a href={link.href}>{link.label}</a>
+					))}
+				</nav>
+			</div>
+		</header>
+		<slot />
+	</body>
+</html>
+
+<style is:global>
+	:root {
+		font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+		color: #1c1c1c;
+		background: #fff;
+		line-height: 1.6;
+	}
+	body {
+		margin: 0;
+	}
+	.header-inner {
+		max-width: 1200px;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		padding: 1.5rem;
+	}
+	.logo img {
+		height: 40px;
+		display: block;
+	}
+	nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1.5rem;
+	}
+	nav a {
+		color: #1c1c1c;
+		text-decoration: none;
+		font-size: 0.85rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+	nav a:hover {
+		opacity: 0.6;
+	}
+	main {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 1.5rem 4rem;
+	}
+</style>

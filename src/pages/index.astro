@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+	title="Devtag' Studios"
+	description="With over 19 years of experience, our expertise in street, urban, and experimental photography and videography has taken us from the West to the East."
+>
+	<main class="hero">
+		<img class="hero-logo" src="/images/logo.png" alt="Devtag' Studios" />
+		<h1>Devtag' Studios</h1>
+		<p>With over 19 years of experience, our expertise in street, urban, and experimental photography and videography has taken us from the West to the East.</p>
+	</main>
+</BaseLayout>
+
+<style>
+	.hero {
+		text-align: center;
+		padding-top: 6rem;
+		padding-bottom: 6rem;
+	}
+	.hero-logo {
+		width: 120px;
+		margin: 0 auto 2rem;
+		display: block;
+	}
+	h1 {
+		font-size: 2rem;
+		margin: 0 0 1.5rem;
+	}
+	p {
+		max-width: 560px;
+		margin: 0 auto;
+		color: #555;
+	}
+</style>
