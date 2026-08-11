@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Lightbox from '../components/Lightbox.astro';
 
-const photoCount = 49;
+const photoCount = 46;
 const photos = Array.from({ length: photoCount }, (_, i) => {
 	const n = String(i + 1).padStart(2, '0');
 	return `/images/gallery/photo-${n}.jpg`;
