@@ -3,13 +3,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Lightbox from '../components/Lightbox.astro';
+import { shuffle } from '../utils/shuffle';
 
 const boudoirDir = path.join(process.cwd(), 'public/images/boudoir');
-const photos = fs
-	.readdirSync(boudoirDir)
-	.filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-	.sort()
-	.map((f) => `/images/boudoir/${f}`);
+const photos = shuffle(
+	fs
+		.readdirSync(boudoirDir)
+		.filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+		.map((f) => `/images/boudoir/${f}`)
+);
 ---
 
 <BaseLayout title="Boudoir Portraits | Devtag' Studios" description="Boudoir portrait photography by Devtag' Studios.">

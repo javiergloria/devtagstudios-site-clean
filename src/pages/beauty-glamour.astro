@@ -3,13 +3,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Lightbox from '../components/Lightbox.astro';
+import { shuffle } from '../utils/shuffle';
 
 const galleryDir = path.join(process.cwd(), 'public/images/gallery');
-const photos = fs
-	.readdirSync(galleryDir)
-	.filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-	.sort()
-	.map((f) => `/images/gallery/${f}`);
+const photos = shuffle(
+	fs
+		.readdirSync(galleryDir)
+		.filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+		.map((f) => `/images/gallery/${f}`)
+);
 ---
 
 <BaseLayout title="Beauty & Glamour | Devtag' Studios" description="Beauty & Glamour photography by Devtag' Studios.">
