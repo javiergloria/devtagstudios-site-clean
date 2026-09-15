@@ -33,6 +33,14 @@ const navLinks = [
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta name="twitter:card" content="summary_large_image" />
+
+		<script is:inline>
+			(function () {
+				var BRAND_COLORS = ['#111111', '#6b7280', '#012b55', '#b91c1c'];
+				var color = BRAND_COLORS[Math.floor(Math.random() * BRAND_COLORS.length)];
+				document.documentElement.style.setProperty('--brand-color', color);
+			})();
+		</script>
 	</head>
 	<body>
 		<header>
@@ -71,6 +79,9 @@ const navLinks = [
 		gap: 0.75rem;
 		padding: 1.5rem;
 	}
+	.site-logo {
+		color: var(--brand-color, #111111);
+	}
 	.logo .site-logo {
 		height: 40px;
 		width: auto;
@@ -82,7 +93,7 @@ const navLinks = [
 		gap: 1.5rem;
 	}
 	nav a {
-		color: #1c1c1c;
+		color: var(--brand-color, #1c1c1c);
 		text-decoration: none;
 		font-size: 0.85rem;
 		letter-spacing: 0.05em;
@@ -98,5 +109,6 @@ const navLinks = [
 	}
 	h1 {
 		font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+		color: var(--brand-color, #1c1c1c);
 	}
 </style>
