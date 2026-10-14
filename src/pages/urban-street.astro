@@ -1,0 +1,21 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { shuffle } from '../utils/shuffle';
+
+const urbanDir = path.join(process.cwd(), 'public/images/urban');
+const photos = shuffle(
+	fs
+		.readdirSync(urbanDir)
+		.filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+		.map((f) => `/images/urban/${f}`)
+);
+---
+
+<BaseLayout title="Urban & Street | Devtag' Studios" description="Urban and street photography by Devtag' Studios.">
+	<main>
+		<Lightbox photos={photos} altPrefix="Urban and street photo" />
+	</main>
+</BaseLayout>
