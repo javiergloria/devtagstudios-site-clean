@@ -8,6 +8,51 @@ import Logo from '../components/Logo.astro';
 
 const { title, description = "Devtag' Studios" } = Astro.props;
 
+const siteUrl = 'https://devtagstudios.com';
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': ['ProfessionalService', 'LocalBusiness'],
+			'@id': `${siteUrl}/#business`,
+			name: "Devtag' Studios",
+			url: `${siteUrl}/`,
+			logo: `${siteUrl}/favicon.png`,
+			image: `${siteUrl}/favicon.png`,
+			description:
+				"Professional glamour, beauty, boudoir, street, urban, and experimental photography and videography with over 19 years of experience.",
+			address: {
+				'@type': 'PostalAddress',
+				addressLocality: 'Mexico City',
+				addressRegion: 'CDMX',
+				addressCountry: 'MX',
+			},
+			areaServed: [
+				{ '@type': 'City', name: 'Mexico City' },
+				{ '@type': 'Country', name: 'Mexico' },
+			],
+			knowsAbout: [
+				'Glamour photography',
+				'Beauty photography',
+				'Boudoir photography',
+				'Street photography',
+				'Urban photography',
+				'Experimental photography',
+				'Videography',
+			],
+			sameAs: ['https://x.com/devtagstudios1'],
+		},
+		{
+			'@type': 'WebSite',
+			'@id': `${siteUrl}/#website`,
+			url: `${siteUrl}/`,
+			name: "Devtag' Studios",
+			publisher: { '@id': `${siteUrl}/#business` },
+			inLanguage: 'en',
+		},
+	],
+};
+
 const navLinks = [
 	{ href: '/', label: 'Home' },
 	{ href: '/beauty-glamour', label: 'Beauty & Glamour' },
@@ -33,6 +78,8 @@ const navLinks = [
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta name="twitter:card" content="summary_large_image" />
+
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
 		<script is:inline>
 			(function () {
