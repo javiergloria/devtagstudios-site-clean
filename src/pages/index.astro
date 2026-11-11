@@ -11,6 +11,28 @@ import Logo from '../components/Logo.astro';
 		<Logo class="hero-logo" />
 		<h1>Devtag' Studios</h1>
 		<p>With over 19 years of experience, our studio delivers professional glamour, beauty, boudoir, street, urban, and experimental photography and videography. Our work has taken us across both the West and the East, bringing a refined eye and a distinctive creative vision to every project.</p>
+
+		<section class="services">
+			<h2>What we do</h2>
+			<ul>
+				<li>
+					<a href="/beauty-glamour/">Beauty &amp; Glamour</a>
+					<span>Polished, editorial portraits with refined lighting and styling.</span>
+				</li>
+				<li>
+					<a href="/boudoir-portraits/">Boudoir Portraits</a>
+					<span>Elegant, tasteful portraits created with trust and artistic care.</span>
+				</li>
+				<li>
+					<a href="/urban-street/">Urban &amp; Street</a>
+					<span>Candid and styled work shot in the streets, architecture, and light of the city.</span>
+				</li>
+				<li>
+					<strong>Experimental &amp; Videography</strong>
+					<span>Creative photo and video projects built around a distinctive visual idea.</span>
+				</li>
+			</ul>
+		</section>
 	</main>
 </BaseLayout>
 
@@ -39,5 +61,43 @@ import Logo from '../components/Logo.astro';
 		text-align-last: center;
 		hyphens: auto;
 		color: var(--brand-color, #555);
+	}
+	.services {
+		max-width: 900px;
+		margin: 4rem auto 0;
+		text-align: center;
+	}
+	.services h2 {
+		font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+		font-size: 1.75rem;
+		color: var(--brand-color, #1c1c1c);
+		margin: 0 0 1.5rem;
+	}
+	.services ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+		gap: 1.5rem;
+	}
+	.services li {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+	.services a,
+	.services strong {
+		color: var(--brand-color, #1c1c1c);
+		font-weight: 700;
+		text-decoration: none;
+		font-size: 1.05rem;
+	}
+	.services a:hover {
+		opacity: 0.6;
+	}
+	.services span {
+		color: #555;
+		font-size: 0.95rem;
 	}
 </style>

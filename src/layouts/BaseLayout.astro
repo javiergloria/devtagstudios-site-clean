@@ -2,11 +2,13 @@
 interface Props {
 	title: string;
 	description?: string;
+	adult?: boolean;
+	noindex?: boolean;
 }
 
 import Logo from '../components/Logo.astro';
 
-const { title, description = "Devtag' Studios | Photography and Videography in CDMX" } = Astro.props;
+const { adult = false, noindex = false, title, description = "Devtag' Studios | Photography and Videography in CDMX" } = Astro.props;
 
 const siteUrl = 'https://devtagstudios.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
@@ -78,6 +80,9 @@ const navLinks = [
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalUrl} />
+		{noindex && <meta name="robots" content="noindex" />}
+		{adult && <meta name="rating" content="adult" />}
+		{adult && <meta name="rating" content="RTA-5042-1996-1400-1577-RTA" />}
 		<meta property="og:type" content="website" />
 		<meta property="og:site_name" content="Devtag' Studios" />
 		<meta property="og:url" content={canonicalUrl} />

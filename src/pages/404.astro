@@ -1,0 +1,36 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout noindex title="Page not found | Devtag' Studios" description="This page could not be found. Browse our photography galleries.">
+	<main class="notfound">
+		<h1>Page not found</h1>
+		<p>The page you are looking for does not exist or has moved. Explore our galleries instead:</p>
+		<nav class="links">
+			<a href="/">Home</a>
+			<a href="/beauty-glamour/">Beauty &amp; Glamour</a>
+			<a href="/boudoir-portraits/">Boudoir Portraits</a>
+			<a href="/urban-street/">Urban &amp; Street</a>
+		</nav>
+	</main>
+</BaseLayout>
+
+<style>
+	.notfound {
+		text-align: center;
+		padding-top: 5rem;
+		padding-bottom: 6rem;
+	}
+	h1 {
+		font-size: 2.5rem;
+		margin: 0 0 1rem;
+	}
+	p {
+		color: var(--brand-color, #555);
+		margin: 0 auto 2rem;
+		max-width: 520px;
+	}
+	.links {
+		justify-content: center;
+	}
+</style>
