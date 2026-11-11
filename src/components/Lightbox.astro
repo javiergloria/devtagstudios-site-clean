@@ -1,10 +1,13 @@
 ---
 interface Props {
 	photos: string[];
-	altPrefix: string;
+	subjects: string[];
+	details: string[];
 }
 
-const { photos, altPrefix } = Astro.props;
+const { photos, subjects, details } = Astro.props;
+const altFor = (i: number) =>
+	`${subjects[i % subjects.length]}, ${details[(i * 7 + 3) % details.length]}`;
 ---
 
 <div class="gallery">
@@ -12,7 +15,7 @@ const { photos, altPrefix } = Astro.props;
 		<img
 			class="gallery-thumb"
 			src={src}
-			alt={`${altPrefix} ${i + 1}`}
+			alt={altFor(i)}
 			loading="lazy"
 			data-index={i}
 			data-full={src}
