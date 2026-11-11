@@ -6,9 +6,11 @@ interface Props {
 
 import Logo from '../components/Logo.astro';
 
-const { title, description = "Devtag' Studios" } = Astro.props;
+const { title, description = "Devtag' Studios | Photography and Videography in CDMX" } = Astro.props;
 
 const siteUrl = 'https://devtagstudios.com';
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const ogImage = `${siteUrl}/og-image.jpg`;
 const jsonLd = {
 	'@context': 'https://schema.org',
 	'@graph': [
@@ -75,9 +77,20 @@ const navLinks = [
 
 		<title>{title}</title>
 		<meta name="description" content={description} />
+		<link rel="canonical" href={canonicalUrl} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Devtag' Studios" />
+		<meta property="og:url" content={canonicalUrl} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:locale" content="en_US" />
 		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImage} />
 
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
