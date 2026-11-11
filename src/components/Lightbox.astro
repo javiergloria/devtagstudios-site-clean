@@ -39,6 +39,7 @@ const altFor = (i: number) =>
 	<button class="lightbox-prev" aria-label="Previous photo">&#8249;</button>
 	<img class="lightbox-img" src="" alt="" />
 	<button class="lightbox-next" aria-label="Next photo">&#8250;</button>
+	<div class="swipe-hint" aria-hidden="true"><span>&#8249;</span><span class="swipe-hand">&#9757;</span><span>&#8250;</span></div>
 </div>
 
 <style>
@@ -82,6 +83,76 @@ const altFor = (i: number) =>
 		object-fit: contain;
 		border-radius: 4px;
 		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+		touch-action: pan-y pinch-zoom;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	.lightbox-img.slide-next {
+		animation: slideInNext 0.25s ease-out;
+	}
+	.lightbox-img.slide-prev {
+		animation: slideInPrev 0.25s ease-out;
+	}
+	@keyframes slideInNext {
+		from { transform: translateX(40px); opacity: 0.3; }
+		to { transform: none; opacity: 1; }
+	}
+	@keyframes slideInPrev {
+		from { transform: translateX(-40px); opacity: 0.3; }
+		to { transform: none; opacity: 1; }
+	}
+	.swipe-hint {
+		display: none;
+		position: absolute;
+		bottom: 2.5rem;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 1001;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.6rem 1.1rem;
+		border-radius: 999px;
+		background: rgba(0, 0, 0, 0.6);
+		color: #fff;
+		font-size: 1.6rem;
+		line-height: 1;
+		pointer-events: none;
+		opacity: 0;
+	}
+	.swipe-hint.show {
+		animation: hintFade 3.2s ease-in-out forwards;
+	}
+	.swipe-hint.show .swipe-hand {
+		animation: hintSwipe 1.1s ease-in-out 3;
+	}
+	.swipe-hand {
+		display: inline-block;
+	}
+	@keyframes hintSwipe {
+		0%, 100% { transform: translateX(-14px); }
+		50% { transform: translateX(14px); }
+	}
+	@keyframes hintFade {
+		0% { opacity: 0; }
+		10%, 85% { opacity: 1; }
+		100% { opacity: 0; }
+	}
+	/* Touch devices (phones, tablets): swipe instead of arrows */
+	@media (hover: none) and (pointer: coarse) {
+		.lightbox-prev,
+		.lightbox-next {
+			display: none;
+		}
+		.swipe-hint {
+			display: flex;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.lightbox-img.slide-next,
+		.lightbox-img.slide-prev,
+		.swipe-hint.show .swipe-hand {
+			animation: none;
+		}
 	}
 	.lightbox-close,
 	.lightbox-prev,
@@ -140,8 +211,13 @@ const altFor = (i: number) =>
 
 		let currentIndex = 0;
 
-		function show(index: number) {
+		function show(index: number, dir: 'next' | 'prev' | null = null) {
 			currentIndex = (index + thumbs.length) % thumbs.length;
+			img.classList.remove('slide-next', 'slide-prev');
+			if (dir) {
+				void img.offsetWidth;
+				img.classList.add(dir === 'next' ? 'slide-next' : 'slide-prev');
+			}
 			const full = thumbs[currentIndex].dataset.full || thumbs[currentIndex].src;
 			img.src = full;
 			img.alt = thumbs[currentIndex].alt;
@@ -151,6 +227,20 @@ const altFor = (i: number) =>
 			show(index);
 			lightbox!.classList.add('open');
 			document.body.style.overflow = 'hidden';
+			showHint();
+		}
+
+		const hint = lightbox.querySelector<HTMLDivElement>('.swipe-hint')!;
+		const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+		function showHint() {
+			if (!isTouch) return;
+			try {
+				if (localStorage.getItem('swipeHintSeen')) return;
+				localStorage.setItem('swipeHintSeen', '1');
+			} catch (_) {}
+			hint.classList.remove('show');
+			void hint.offsetWidth;
+			hint.classList.add('show');
 		}
 
 		function close() {
@@ -164,15 +254,39 @@ const altFor = (i: number) =>
 
 		closeBtn.addEventListener('click', close);
 		backdrop.addEventListener('click', close);
-		prevBtn.addEventListener('click', () => show(currentIndex - 1));
-		nextBtn.addEventListener('click', () => show(currentIndex + 1));
+		prevBtn.addEventListener('click', () => show(currentIndex - 1, 'prev'));
+		nextBtn.addEventListener('click', () => show(currentIndex + 1, 'next'));
 
 		document.addEventListener('keydown', (e) => {
 			if (!lightbox!.classList.contains('open')) return;
 			if (e.key === 'Escape') close();
-			if (e.key === 'ArrowLeft') show(currentIndex - 1);
-			if (e.key === 'ArrowRight') show(currentIndex + 1);
+			if (e.key === 'ArrowLeft') show(currentIndex - 1, 'prev');
+			if (e.key === 'ArrowRight') show(currentIndex + 1, 'next');
 		});
+
+		// Swipe left/right on touch devices
+		if (isTouch) {
+			let startX = 0;
+			let startY = 0;
+			let tracking = false;
+			lightbox.addEventListener('touchstart', (e) => {
+				if (e.touches.length !== 1) { tracking = false; return; }
+				startX = e.touches[0].clientX;
+				startY = e.touches[0].clientY;
+				tracking = true;
+			}, { passive: true });
+			lightbox.addEventListener('touchend', (e) => {
+				if (!tracking) return;
+				tracking = false;
+				const t = e.changedTouches[0];
+				const dx = t.clientX - startX;
+				const dy = t.clientY - startY;
+				if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+				hint.classList.remove('show');
+				if (dx < 0) show(currentIndex + 1, 'next');
+				else show(currentIndex - 1, 'prev');
+			}, { passive: true });
+		}
 	}
 
 	initLightbox();
