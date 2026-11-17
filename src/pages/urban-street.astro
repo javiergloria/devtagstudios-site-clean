@@ -1,25 +1,5 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Lightbox from '../components/Lightbox.astro';
-import { shuffle } from '../utils/shuffle';
-
-const urbanDir = path.join(process.cwd(), 'public/images/urban');
-const photos = shuffle(
-	fs
-		.readdirSync(urbanDir)
-		.filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
-		.map((f) => `/images/urban/${f}`)
-);
+import GalleryPage from '../components/GalleryPage.astro';
 ---
 
-<BaseLayout title="Urban & Street Photography in CDMX | Devtag' Studios" description="Urban and street photography in CDMX (Mexico City) by Devtag' Studios. Fashion, city atmosphere and experimental compositions.">
-	<main>
-		<section class="page-intro">
-			<h1>Urban &amp; Street Photography</h1>
-			<p>Candid and styled work shot in the streets, architecture, and light of the city. Our urban and street photography blends fashion, atmosphere, and experimental composition, drawing on more than 19 years of experience across the West and the East.</p>
-		</section>
-		<Lightbox photos={photos} subjects={['Urban photography', 'Street photography', 'Urban fashion portrait', 'City street portrait', 'Experimental urban photo', 'Street style photoshoot', 'Urban portrait']} details={['city architecture', 'stairs and concrete', 'street style', 'natural city light', 'by Devtag\' Studios', 'urban fashion', 'cinematic city mood', 'downtown setting']} />
-	</main>
-</BaseLayout>
+<GalleryPage lang="en" pageKey="urban-street" />

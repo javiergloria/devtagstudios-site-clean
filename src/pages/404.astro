@@ -12,6 +12,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 			<a href="/boudoir-portraits/">Boudoir Portraits</a>
 			<a href="/urban-street/">Urban &amp; Street</a>
 		</nav>
+
+		<h2 lang="es">Página no encontrada</h2>
+		<p lang="es">La página que buscas no existe o se ha movido. Explora nuestras galerías:</p>
+		<nav class="links" lang="es">
+			<a href="/es/">Inicio</a>
+			<a href="/es/beauty-glamour/">Belleza y Glamour</a>
+			<a href="/es/boudoir-portraits/">Retratos Boudoir</a>
+			<a href="/es/urban-street/">Urbano y Calle</a>
+		</nav>
+
+		<h2 lang="ja">ページが見つかりません</h2>
+		<p lang="ja">お探しのページは存在しないか、移動しました。ギャラリーをご覧ください：</p>
+		<nav class="links" lang="ja">
+			<a href="/ja/">ホーム</a>
+			<a href="/ja/beauty-glamour/">ビューティー＆グラマー</a>
+			<a href="/ja/boudoir-portraits/">ブドワール・ポートレート</a>
+			<a href="/ja/urban-street/">アーバン＆ストリート</a>
+		</nav>
 	</main>
 </BaseLayout>
 
@@ -24,6 +42,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 	h1 {
 		font-size: 2.5rem;
 		margin: 0 0 1rem;
+	}
+	h2 {
+		font-size: 1.5rem;
+		margin: 2.5rem 0 0.75rem;
+		color: var(--brand-color, #1c1c1c);
 	}
 	p {
 		color: var(--brand-color, #555);

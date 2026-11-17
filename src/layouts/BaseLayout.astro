@@ -1,17 +1,30 @@
 ---
+import type { Lang, PageKey } from '../i18n/ui';
+
 interface Props {
 	title: string;
 	description?: string;
 	adult?: boolean;
 	noindex?: boolean;
+	lang?: Lang;
+	/** Which page this is; used for the language switcher and hreflang alternates. Omit for pages with no translations (404). */
+	pageKey?: PageKey;
 }
 
 import Logo from '../components/Logo.astro';
+import LangSwitcher from '../components/LangSwitcher.astro';
+import { dict, meta, languages, pagePath } from '../i18n/ui';
 
-const { adult = false, noindex = false, title, description = "Devtag' Studios | Photography and Videography in CDMX" } = Astro.props;
+const { adult = false, noindex = false, title, lang = 'en', pageKey } = Astro.props;
+const t = dict[lang];
+const description = Astro.props.description ?? t.defaultDescription;
 
 const siteUrl = 'https://devtagstudios.com';
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
+const alternates = pageKey
+	? languages.map((l) => ({ lang: l, href: new URL(pagePath(l, pageKey), siteUrl).href, path: pagePath(l, pageKey) }))
+	: [];
+const altPaths = Object.fromEntries(alternates.map((a) => [a.lang, a.path]));
 const ogImage = `${siteUrl}/og-image.jpg`;
 const jsonLd = {
 	'@context': 'https://schema.org',
@@ -23,8 +36,7 @@ const jsonLd = {
 			url: `${siteUrl}/`,
 			logo: `${siteUrl}/favicon.png`,
 			image: `${siteUrl}/favicon.png`,
-			description:
-				"Professional glamour, beauty, boudoir, street, urban, and experimental photography and videography with over 19 years of experience.",
+			description: t.jsonLdDescription,
 			address: {
 				'@type': 'PostalAddress',
 				addressLocality: 'Mexico City',
@@ -52,20 +64,16 @@ const jsonLd = {
 			url: `${siteUrl}/`,
 			name: "Devtag' Studios",
 			publisher: { '@id': `${siteUrl}/#business` },
-			inLanguage: 'en',
+			inLanguage: languages.map((l) => meta[l].htmlLang),
 		},
 	],
 };
 
-const navLinks = [
-	{ href: '/', label: 'Home' },
-	{ href: '/beauty-glamour', label: 'Beauty & Glamour' },
-	{ href: '/boudoir-portraits', label: 'Boudoir Portraits' },
-	{ href: '/urban-street', label: 'Urban & Street' },
-];
+const navKeys: PageKey[] = ['home', 'beauty-glamour', 'boudoir-portraits', 'urban-street'];
+const navLinks = navKeys.map((key) => ({ href: pagePath(lang, key), label: t.nav[key] }));
 ---
 
-<html lang="en">
+<html lang={meta[lang].htmlLang}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -80,6 +88,8 @@ const navLinks = [
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonicalUrl} />
+		{alternates.map((a) => <link rel="alternate" hreflang={meta[a.lang].htmlLang} href={a.href} />)}
+		{alternates.length > 0 && <link rel="alternate" hreflang="x-default" href={alternates.find((a) => a.lang === 'en')?.href} />}
 		{noindex && <meta name="robots" content="noindex" />}
 		{adult && <meta name="rating" content="adult" />}
 		{adult && <meta name="rating" content="RTA-5042-1996-1400-1577-RTA" />}
@@ -91,13 +101,21 @@ const navLinks = [
 		<meta property="og:image" content={ogImage} />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
-		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale" content={meta[lang].ogLocale} />
+		{languages.filter((l) => l !== lang && alternates.length > 0).map((l) => <meta property="og:locale:alternate" content={meta[l].ogLocale} />)}
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta name="twitter:title" content={title} />
 		<meta name="twitter:description" content={description} />
 		<meta name="twitter:image" content={ogImage} />
 
 		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+		{/* First visit: if the visitor's browser language is Spanish or Japanese, send them to that version.
+		    Only runs on the English (default) URLs, only when no language was chosen with the flags, and never for search bots
+		    (they send no Spanish/Japanese preference). */}
+		{pageKey && (
+			<script is:inline set:html={`window.__ALT=${JSON.stringify(altPaths)};(function(){try{var cur=document.documentElement.getAttribute('lang');if(cur!=='en'||!window.__ALT)return;var saved=null;try{saved=localStorage.getItem('lang');}catch(e){}var target=null;if(saved){target=saved;}else{var langs=(navigator.languages&&navigator.languages.length)?navigator.languages:[navigator.language||''];for(var i=0;i<langs.length;i++){var p=String(langs[i]).toLowerCase().split('-')[0];if(p==='es'||p==='ja'||p==='en'){target=p;break;}}}if(target&&target!=='en'&&window.__ALT[target]){location.replace(window.__ALT[target]+location.search+location.hash);}}catch(e){}})();`} />
+		)}
 
 		<script is:inline>
 			(function () {
@@ -110,14 +128,15 @@ const navLinks = [
 	<body>
 		<header>
 			<div class="header-inner">
-				<a class="logo" href="/">
+				<a class="logo" href={pagePath(lang, 'home')}>
 					<Logo />
 				</a>
 				<nav>
 					{navLinks.map((link) => (
-						<a href={link.href} target={link.external ? '_blank' : undefined} rel={link.external ? 'noopener noreferrer' : undefined}>{link.label}</a>
+						<a href={link.href}>{link.label}</a>
 					))}
 				</nav>
+				{pageKey && <LangSwitcher lang={lang} pageKey={pageKey} />}
 			</div>
 		</header>
 		<slot />

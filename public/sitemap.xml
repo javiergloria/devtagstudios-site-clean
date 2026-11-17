@@ -1,7 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://devtagstudios.com/</loc><priority>1.0</priority></url>
-  <url><loc>https://devtagstudios.com/beauty-glamour/</loc><priority>0.8</priority></url>
-  <url><loc>https://devtagstudios.com/boudoir-portraits/</loc><priority>0.8</priority></url>
-  <url><loc>https://devtagstudios.com/urban-street/</loc><priority>0.8</priority></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://devtagstudios.com/</loc>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/es/</loc>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/ja/</loc>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/beauty-glamour/</loc>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/beauty-glamour/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/es/beauty-glamour/</loc>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/beauty-glamour/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/ja/beauty-glamour/</loc>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/beauty-glamour/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/beauty-glamour/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/boudoir-portraits/</loc>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/boudoir-portraits/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/es/boudoir-portraits/</loc>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/boudoir-portraits/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/ja/boudoir-portraits/</loc>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/boudoir-portraits/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/boudoir-portraits/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/urban-street/</loc>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/urban-street/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/es/urban-street/</loc>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/urban-street/"/>
+  </url>
+  <url>
+    <loc>https://devtagstudios.com/ja/urban-street/</loc>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://devtagstudios.com/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://devtagstudios.com/es/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="ja" href="https://devtagstudios.com/ja/urban-street/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://devtagstudios.com/urban-street/"/>
+  </url>
 </urlset>

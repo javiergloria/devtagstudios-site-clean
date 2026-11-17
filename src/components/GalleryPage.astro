@@ -1,0 +1,44 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Lightbox from './Lightbox.astro';
+import { shuffle } from '../utils/shuffle';
+import { dict, meta } from '../i18n/ui';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+	lang: Lang;
+	pageKey: 'beauty-glamour' | 'boudoir-portraits' | 'urban-street';
+}
+
+const { lang, pageKey } = Astro.props;
+
+// Each gallery reads its own image folder at build time.
+const folders = {
+	'beauty-glamour': 'gallery',
+	'boudoir-portraits': 'boudoir',
+	'urban-street': 'urban',
+} as const;
+const folder = folders[pageKey];
+
+const galleryDir = path.join(process.cwd(), 'public/images', folder);
+const photos = shuffle(
+	fs
+		.readdirSync(galleryDir)
+		.filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+		.map((f) => `/images/${folder}/${f}`)
+);
+
+const text = dict[lang].galleries[pageKey];
+---
+
+<BaseLayout lang={lang} pageKey={pageKey} adult={pageKey === 'boudoir-portraits'} title={text.title} description={text.description}>
+	<main>
+		<section class="page-intro">
+			<h1>{text.h1}</h1>
+			<p>{text.intro}</p>
+		</section>
+		<Lightbox photos={photos} subjects={text.subjects} details={text.details} labels={dict[lang].lightbox} sep={meta[lang].sep} />
+	</main>
+</BaseLayout>

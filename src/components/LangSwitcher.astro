@@ -1,0 +1,100 @@
+---
+import { languages, meta, dict, pagePath } from '../i18n/ui';
+import type { Lang, PageKey } from '../i18n/ui';
+
+interface Props {
+	lang: Lang;
+	pageKey: PageKey;
+}
+
+const { lang, pageKey } = Astro.props;
+---
+
+<div class="lang-switcher" role="group" aria-label={dict[lang].switcherLabel}>
+	{languages.map((l) => (
+		<a
+			href={pagePath(l, pageKey)}
+			data-lang={l}
+			hreflang={meta[l].htmlLang}
+			lang={meta[l].htmlLang}
+			title={meta[l].name}
+			aria-label={meta[l].name}
+			aria-current={l === lang ? 'true' : undefined}
+			class:list={['lang-link', { active: l === lang }]}
+		>
+			{l === 'es' && (
+				<svg class="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true" focusable="false">
+					<rect width="24" height="16" fill="#ffffff" />
+					<rect width="8" height="16" fill="#006847" />
+					<rect x="16" width="8" height="16" fill="#ce1126" />
+					<circle cx="12" cy="8" r="2.2" fill="#8c6b3f" />
+				</svg>
+			)}
+			{l === 'en' && (
+				<svg class="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true" focusable="false">
+					<rect width="24" height="16" fill="#b22234" />
+					<rect y="2.29" width="24" height="2.29" fill="#ffffff" />
+					<rect y="6.86" width="24" height="2.29" fill="#ffffff" />
+					<rect y="11.43" width="24" height="2.29" fill="#ffffff" />
+					<rect width="10.5" height="9.14" fill="#3c3b6e" />
+				</svg>
+			)}
+			{l === 'ja' && (
+				<svg class="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden="true" focusable="false">
+					<rect width="24" height="16" fill="#ffffff" />
+					<circle cx="12" cy="8" r="4.8" fill="#bc002d" />
+				</svg>
+			)}
+			<span>{meta[l].label}</span>
+		</a>
+	))}
+</div>
+
+<script is:inline>
+	(function () {
+		var links = document.querySelectorAll('.lang-switcher a');
+		for (var i = 0; i < links.length; i++) {
+			links[i].addEventListener('click', function (e) {
+				try {
+					localStorage.setItem('lang', e.currentTarget.getAttribute('data-lang'));
+				} catch (_) {}
+			});
+		}
+	})();
+</script>
+
+<style>
+	.lang-switcher {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+	.lang-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.2rem 0.4rem;
+		border-radius: 4px;
+		border: 1px solid transparent;
+		color: var(--brand-color, #1c1c1c);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-decoration: none;
+		opacity: 0.6;
+	}
+	.lang-link:hover {
+		opacity: 1;
+	}
+	.lang-link.active {
+		opacity: 1;
+		border-color: var(--brand-color, #1c1c1c);
+	}
+	.flag {
+		display: block;
+		width: 22px;
+		height: auto;
+		border-radius: 2px;
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+	}
+</style>

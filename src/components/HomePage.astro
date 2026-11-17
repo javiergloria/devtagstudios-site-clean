@@ -1,0 +1,108 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Logo from './Logo.astro';
+import { dict, pagePath } from '../i18n/ui';
+import type { Lang } from '../i18n/ui';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const text = dict[lang].home;
+---
+
+<BaseLayout lang={lang} pageKey="home" title={text.title} description={text.description}>
+	<main class="hero">
+		<Logo class="hero-logo" />
+		<h1>Devtag' Studios</h1>
+		<p>{text.intro}</p>
+
+		<section class="services">
+			<h2>{text.servicesTitle}</h2>
+			<ul>
+				{text.services.map((s) => (
+					<li>
+						{s.key ? <a href={pagePath(lang, s.key)}>{s.name}</a> : <strong>{s.name}</strong>}
+						<span>{s.text}</span>
+					</li>
+				))}
+			</ul>
+		</section>
+	</main>
+</BaseLayout>
+
+<style>
+	.hero {
+		min-height: calc(100vh - var(--header-h, 88px));
+		min-height: calc(100dvh - var(--header-h, 88px));
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		padding-top: 1rem;
+		padding-bottom: 1.5rem;
+	}
+	.hero :global(.hero-logo) {
+		width: 200px;
+		height: auto;
+		margin: -2.25rem auto -2.25rem;
+		display: block;
+	}
+	h1 {
+		font-size: 3.25rem;
+		font-weight: 700;
+		line-height: 1.1;
+		margin: 0 0 1rem;
+	}
+	p {
+		max-width: 620px;
+		font-size: 1.1rem;
+		margin: 0 auto;
+		text-align: justify;
+		text-align-last: center;
+		hyphens: auto;
+		color: var(--brand-color, #555);
+	}
+	.services {
+		width: 100%;
+		max-width: 900px;
+		margin: 2rem auto 0;
+		text-align: center;
+	}
+	.services h2 {
+		font-family: 'Baloo 2', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+		font-size: 1.75rem;
+		color: var(--brand-color, #1c1c1c);
+		margin: 0 0 1rem;
+	}
+	.services ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+		gap: 1.5rem;
+	}
+	.services li {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+	.services a,
+	.services strong {
+		color: var(--brand-color, #1c1c1c);
+		font-weight: 700;
+		text-decoration: none;
+		font-size: 1.05rem;
+	}
+	.services a:hover {
+		opacity: 0.6;
+	}
+	.services span {
+		color: var(--brand-color, #555);
+		font-size: 0.95rem;
+	}
+</style>

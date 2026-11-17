@@ -3,12 +3,20 @@ interface Props {
 	photos: string[];
 	subjects: string[];
 	details: string[];
+	labels?: { close: string; prev: string; next: string };
+	sep?: string;
 }
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-const { photos, subjects, details } = Astro.props;
+const {
+	photos,
+	subjects,
+	details,
+	labels = { close: 'Close', prev: 'Previous photo', next: 'Next photo' },
+	sep = ', ',
+} = Astro.props;
 const thumbFor = (src: string) => {
 	const dir = path.posix.dirname(src);
 	const name = path.posix.basename(src).replace(/\.[^.]+$/, '');
@@ -16,7 +24,7 @@ const thumbFor = (src: string) => {
 	return fs.existsSync(path.join(process.cwd(), 'public', rel)) ? rel : src;
 };
 const altFor = (i: number) =>
-	`${subjects[i % subjects.length]}, ${details[(i * 7 + 3) % details.length]}`;
+	`${subjects[i % subjects.length]}${sep}${details[(i * 7 + 3) % details.length]}`;
 ---
 
 <div class="gallery">
@@ -35,10 +43,10 @@ const altFor = (i: number) =>
 
 <div class="lightbox" id="lightbox">
 	<div class="lightbox-backdrop"></div>
-	<button class="lightbox-close" aria-label="Close">&times;</button>
-	<button class="lightbox-prev" aria-label="Previous photo">&#8249;</button>
+	<button class="lightbox-close" aria-label={labels.close}>&times;</button>
+	<button class="lightbox-prev" aria-label={labels.prev}>&#8249;</button>
 	<img class="lightbox-img" src="" alt="" />
-	<button class="lightbox-next" aria-label="Next photo">&#8250;</button>
+	<button class="lightbox-next" aria-label={labels.next}>&#8250;</button>
 	<div class="swipe-hint" aria-hidden="true"><span>&#8249;</span><span class="swipe-hand">&#9757;</span><span>&#8250;</span></div>
 </div>
 
