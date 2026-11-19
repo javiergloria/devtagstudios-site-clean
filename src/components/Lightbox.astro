@@ -23,12 +23,33 @@ const thumbFor = (src: string) => {
 	const rel = `${dir}/thumbs/${name}.webp`;
 	return fs.existsSync(path.join(process.cwd(), 'public', rel)) ? rel : src;
 };
+const isVideo = (src: string) => /\.mp4$/i.test(src);
+const posterFor = (src: string) => {
+	const dir = path.posix.dirname(src);
+	const name = path.posix.basename(src).replace(/\.[^.]+$/, '');
+	return `${dir}/thumbs/${name}-poster.jpg`;
+};
 const altFor = (i: number) =>
 	`${subjects[i % subjects.length]}${sep}${details[(i * 7 + 3) % details.length]}`;
 ---
 
 <div class="gallery">
-	{photos.map((src, i) => (
+	{photos.map((src, i) => isVideo(src) ? (
+		<span class="thumb-wrap">
+			<img
+				class="gallery-thumb"
+				src={thumbFor(src)}
+				alt={altFor(i)}
+				loading="lazy"
+				decoding="async"
+				data-index={i}
+				data-full={src}
+				data-video="1"
+				data-poster={posterFor(src)}
+			/>
+			<span class="play-badge" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+		</span>
+	) : (
 		<img
 			class="gallery-thumb"
 			src={thumbFor(src)}
@@ -46,6 +67,7 @@ const altFor = (i: number) =>
 	<button class="lightbox-close" aria-label={labels.close}>&times;</button>
 	<button class="lightbox-prev" aria-label={labels.prev}>&#8249;</button>
 	<img class="lightbox-img" src="" alt="" />
+	<video class="lightbox-video" controls playsinline preload="metadata" hidden></video>
 	<button class="lightbox-next" aria-label={labels.next}>&#8250;</button>
 	<div class="swipe-hint" aria-hidden="true"><span>&#8249;</span><span class="swipe-hand">&#9757;</span><span>&#8250;</span></div>
 </div>
@@ -64,6 +86,33 @@ const altFor = (i: number) =>
 		display: block;
 		cursor: pointer;
 		border-radius: 4px;
+	}
+
+	.thumb-wrap {
+		position: relative;
+		display: block;
+	}
+	.play-badge {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 3.75rem;
+		height: 3.75rem;
+		transform: translate(-50%, -50%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding-left: 0.2rem;
+		border-radius: 50%;
+		background: rgba(0, 0, 0, 0.55);
+		border: 2px solid rgba(255, 255, 255, 0.9);
+		color: #fff;
+		pointer-events: none;
+		transition: transform 0.15s ease, background 0.15s ease;
+	}
+	.thumb-wrap:hover .play-badge {
+		transform: translate(-50%, -50%) scale(1.08);
+		background: rgba(0, 0, 0, 0.75);
 	}
 
 	.lightbox {
@@ -95,10 +144,24 @@ const altFor = (i: number) =>
 		user-select: none;
 		-webkit-user-select: none;
 	}
-	.lightbox-img.slide-next {
+	.lightbox-video {
+		position: relative;
+		max-width: 90vw;
+		max-height: 88vh;
+		border-radius: 4px;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+		background: #000;
+	}
+	.lightbox-video[hidden],
+	.lightbox-img[hidden] {
+		display: none;
+	}
+	.lightbox-img.slide-next,
+	.lightbox-video.slide-next {
 		animation: slideInNext 0.25s ease-out;
 	}
-	.lightbox-img.slide-prev {
+	.lightbox-img.slide-prev,
+	.lightbox-video.slide-prev {
 		animation: slideInPrev 0.25s ease-out;
 	}
 	@keyframes slideInNext {
@@ -212,6 +275,7 @@ const altFor = (i: number) =>
 		if (!lightbox || thumbs.length === 0) return;
 
 		const img = lightbox.querySelector<HTMLImageElement>('.lightbox-img')!;
+		const video = lightbox.querySelector<HTMLVideoElement>('.lightbox-video')!;
 		const closeBtn = lightbox.querySelector<HTMLButtonElement>('.lightbox-close')!;
 		const prevBtn = lightbox.querySelector<HTMLButtonElement>('.lightbox-prev')!;
 		const nextBtn = lightbox.querySelector<HTMLButtonElement>('.lightbox-next')!;
@@ -221,14 +285,35 @@ const altFor = (i: number) =>
 
 		function show(index: number, dir: 'next' | 'prev' | null = null) {
 			currentIndex = (index + thumbs.length) % thumbs.length;
-			img.classList.remove('slide-next', 'slide-prev');
+			const t = thumbs[currentIndex];
+			const el = t.dataset.video ? video : img;
+			stopVideo();
+			el.classList.remove('slide-next', 'slide-prev');
 			if (dir) {
-				void img.offsetWidth;
-				img.classList.add(dir === 'next' ? 'slide-next' : 'slide-prev');
+				void el.offsetWidth;
+				el.classList.add(dir === 'next' ? 'slide-next' : 'slide-prev');
 			}
-			const full = thumbs[currentIndex].dataset.full || thumbs[currentIndex].src;
-			img.src = full;
-			img.alt = thumbs[currentIndex].alt;
+			const full = t.dataset.full || t.src;
+			if (t.dataset.video) {
+				img.hidden = true;
+				video.hidden = false;
+				video.poster = t.dataset.poster || '';
+				video.src = full;
+				video.setAttribute('aria-label', t.alt);
+			} else {
+				video.hidden = true;
+				img.hidden = false;
+				img.src = full;
+				img.alt = t.alt;
+			}
+		}
+
+		function stopVideo() {
+			video.pause();
+			if (video.getAttribute('src')) {
+				video.removeAttribute('src');
+				video.load();
+			}
 		}
 
 		function open(index: number) {
@@ -252,6 +337,7 @@ const altFor = (i: number) =>
 		}
 
 		function close() {
+			stopVideo();
 			lightbox!.classList.remove('open');
 			document.body.style.overflow = '';
 		}
@@ -278,7 +364,7 @@ const altFor = (i: number) =>
 			let startY = 0;
 			let tracking = false;
 			lightbox.addEventListener('touchstart', (e) => {
-				if (e.touches.length !== 1) { tracking = false; return; }
+				if (e.touches.length !== 1 || e.target === video) { tracking = false; return; }
 				startX = e.touches[0].clientX;
 				startY = e.touches[0].clientY;
 				tracking = true;
