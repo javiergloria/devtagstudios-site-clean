@@ -34,7 +34,7 @@ def exif_taken(path):
 
 
 def git_added():
-    out = subprocess.run(['git', 'log', '--diff-filter=A', '--name-only', '--format=@@%aI'],
+    out = subprocess.run(['git', 'log', '--no-renames', '--diff-filter=A', '--name-only', '--format=@@%aI'],
                          cwd=ROOT, capture_output=True, text=True).stdout
     added, cur = {}, None
     for line in out.splitlines():  # newest first, so later lines overwrite = oldest wins
