@@ -185,6 +185,15 @@ const altFor = (i: number) =>
 		touch-action: pan-y pinch-zoom;
 		user-select: none;
 		-webkit-user-select: none;
+		cursor: zoom-in;
+		transition: transform 0.2s ease-out;
+	}
+	.lightbox-img.zoomed {
+		transform: scale(2.4);
+		cursor: zoom-out;
+		touch-action: none;
+		transition: none;
+		animation: none;
 	}
 	.lightbox-video {
 		position: relative;
@@ -330,6 +339,7 @@ const altFor = (i: number) =>
 			const t = thumbs[currentIndex];
 			const el = t.dataset.video ? video : img;
 			stopVideo();
+			resetZoom();
 			el.classList.remove('slide-next', 'slide-prev');
 			if (dir) {
 				void el.offsetWidth;
@@ -349,6 +359,36 @@ const altFor = (i: number) =>
 				img.alt = t.alt;
 			}
 		}
+
+		// Zoom: click/tap the photo to zoom in, move the pointer (or drag a finger) to pan, click again to zoom out.
+		function setOrigin(x: number, y: number) {
+			// Use the unzoomed box (saved on zoom-in): the live rect is scaled while zoomed.
+			const px = Math.min(1, Math.max(0, (x - zoomBox.left) / zoomBox.width));
+			const py = Math.min(1, Math.max(0, (y - zoomBox.top) / zoomBox.height));
+			img.style.transformOrigin = `${px * 100}% ${py * 100}%`;
+		}
+		let zoomed = false;
+		let zoomBox = { left: 0, top: 0, width: 1, height: 1 };
+		function resetZoom() {
+			zoomed = false;
+			img.classList.remove('zoomed');
+			img.style.transformOrigin = '';
+		}
+		img.addEventListener('click', (e) => {
+			if (zoomed) { resetZoom(); return; }
+			const r = img.getBoundingClientRect();
+			zoomBox = { left: r.left, top: r.top, width: r.width, height: r.height };
+			setOrigin(e.clientX, e.clientY);
+			zoomed = true;
+			img.classList.add('zoomed');
+		});
+		img.addEventListener('mousemove', (e) => { if (zoomed) setOrigin(e.clientX, e.clientY); });
+		img.addEventListener('touchmove', (e) => {
+			if (zoomed && e.touches.length === 1) {
+				e.preventDefault();
+				setOrigin(e.touches[0].clientX, e.touches[0].clientY);
+			}
+		}, { passive: false });
 
 		function stopVideo() {
 			video.pause();
@@ -380,6 +420,7 @@ const altFor = (i: number) =>
 
 		function close() {
 			stopVideo();
+			resetZoom();
 			lightbox!.classList.remove('open');
 			document.body.style.overflow = '';
 		}
@@ -436,7 +477,7 @@ const altFor = (i: number) =>
 			let startY = 0;
 			let tracking = false;
 			lightbox.addEventListener('touchstart', (e) => {
-				if (e.touches.length !== 1 || e.target === video) { tracking = false; return; }
+				if (e.touches.length !== 1 || e.target === video || zoomed) { tracking = false; return; }
 				startX = e.touches[0].clientX;
 				startY = e.touches[0].clientY;
 				tracking = true;
