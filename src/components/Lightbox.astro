@@ -5,6 +5,8 @@ interface Props {
 	details: string[];
 	labels?: { close: string; prev: string; next: string };
 	sep?: string;
+	dates?: Record<string, [string | null, string | null]>;
+	sortLabels?: { label: string; shuffle: string; takenNew: string; takenOld: string; addedNew: string; addedOld: string };
 }
 
 import fs from 'node:fs';
@@ -16,6 +18,8 @@ const {
 	details,
 	labels = { close: 'Close', prev: 'Previous photo', next: 'Next photo' },
 	sep = ', ',
+	dates,
+	sortLabels,
 } = Astro.props;
 const thumbFor = (src: string) => {
 	const dir = path.posix.dirname(src);
@@ -33,6 +37,19 @@ const altFor = (i: number) =>
 	`${subjects[i % subjects.length]}${sep}${details[(i * 7 + 3) % details.length]}`;
 ---
 
+{sortLabels && (
+	<div class="sort-bar">
+		<label for="gallery-sort">{sortLabels.label}</label>
+		<select id="gallery-sort">
+			<option value="shuffle" selected>{sortLabels.shuffle}</option>
+			<option value="taken-new">{sortLabels.takenNew}</option>
+			<option value="taken-old">{sortLabels.takenOld}</option>
+			<option value="added-new">{sortLabels.addedNew}</option>
+			<option value="added-old">{sortLabels.addedOld}</option>
+		</select>
+	</div>
+)}
+
 <div class="gallery">
 	{photos.map((src, i) => isVideo(src) ? (
 		<span class="thumb-wrap">
@@ -44,6 +61,8 @@ const altFor = (i: number) =>
 				decoding="async"
 				data-index={i}
 				data-full={src}
+				data-taken={dates?.[src]?.[0] ?? ''}
+				data-added={dates?.[src]?.[1] ?? ''}
 				data-video="1"
 				data-poster={posterFor(src)}
 			/>
@@ -58,6 +77,8 @@ const altFor = (i: number) =>
 			decoding="async"
 			data-index={i}
 			data-full={src}
+			data-taken={dates?.[src]?.[0] ?? ''}
+			data-added={dates?.[src]?.[1] ?? ''}
 		/>
 	))}
 </div>
@@ -88,6 +109,27 @@ const altFor = (i: number) =>
 		border-radius: 4px;
 	}
 
+	.sort-bar {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding-top: 1rem;
+		font-size: 0.9rem;
+		color: var(--brand-color, #555);
+	}
+	.sort-bar select {
+		font: inherit;
+		color: inherit;
+		background: transparent;
+		border: 1px solid currentColor;
+		border-radius: 4px;
+		padding: 0.25rem 0.5rem;
+		cursor: pointer;
+	}
+	.sort-bar + .gallery {
+		padding-top: 0.5rem;
+	}
 	.thumb-wrap {
 		position: relative;
 		display: block;
@@ -270,7 +312,7 @@ const altFor = (i: number) =>
 
 <script>
 	function initLightbox() {
-		const thumbs = Array.from(document.querySelectorAll<HTMLImageElement>('.gallery-thumb'));
+		let thumbs = Array.from(document.querySelectorAll<HTMLImageElement>('.gallery-thumb'));
 		const lightbox = document.getElementById('lightbox');
 		if (!lightbox || thumbs.length === 0) return;
 
@@ -342,9 +384,39 @@ const altFor = (i: number) =>
 			document.body.style.overflow = '';
 		}
 
-		thumbs.forEach((thumb, i) => {
-			thumb.addEventListener('click', () => open(i));
+		thumbs.forEach((thumb) => {
+			thumb.addEventListener('click', () => open(thumbs.indexOf(thumb)));
 		});
+
+		// Sort control (only on galleries that pass dates). Photos without a date go last.
+		const sortSel = document.getElementById('gallery-sort') as HTMLSelectElement | null;
+		const grid = document.querySelector<HTMLElement>('.gallery');
+		if (sortSel && grid) {
+			const unit = (t: HTMLImageElement) => (t.parentElement!.classList.contains('thumb-wrap') ? t.parentElement! : t);
+			sortSel.addEventListener('change', () => {
+				const mode = sortSel.value;
+				const items = thumbs.slice();
+				if (mode === 'shuffle') {
+					for (let i = items.length - 1; i > 0; i--) {
+						const j = Math.floor(Math.random() * (i + 1));
+						[items[i], items[j]] = [items[j], items[i]];
+					}
+				} else {
+					const field = mode.startsWith('taken') ? 'taken' : 'added';
+					const dir = mode.endsWith('new') ? -1 : 1;
+					items.sort((a, b) => {
+						const x = a.dataset[field] || '';
+						const y = b.dataset[field] || '';
+						if (!x && !y) return 0;
+						if (!x) return 1;
+						if (!y) return -1;
+						return x < y ? -dir : x > y ? dir : 0;
+					});
+				}
+				items.forEach((t) => grid.appendChild(unit(t)));
+				thumbs = items;
+			});
+		}
 
 		closeBtn.addEventListener('click', close);
 		backdrop.addEventListener('click', close);

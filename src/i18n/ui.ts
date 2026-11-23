@@ -39,6 +39,7 @@ type Dict = {
 	};
 	galleries: Record<'beauty-glamour' | 'boudoir-portraits' | 'urban-street', GalleryText>;
 	lightbox: { close: string; prev: string; next: string };
+	sort: { label: string; shuffle: string; takenNew: string; takenOld: string; addedNew: string; addedOld: string };
 };
 
 const brand = "Devtag' Studios";
@@ -99,6 +100,7 @@ export const dict: Record<Lang, Dict> = {
 			},
 		},
 		lightbox: { close: 'Close', prev: 'Previous photo', next: 'Next photo' },
+		sort: { label: 'Sort by', shuffle: 'Shuffle', takenNew: 'Date taken: newest', takenOld: 'Date taken: oldest', addedNew: 'Date added: newest', addedOld: 'Date added: oldest' },
 	},
 
 	es: {
@@ -156,6 +158,7 @@ export const dict: Record<Lang, Dict> = {
 			},
 		},
 		lightbox: { close: 'Cerrar', prev: 'Foto anterior', next: 'Foto siguiente' },
+		sort: { label: 'Ordenar por', shuffle: 'Aleatorio', takenNew: 'Fecha de la foto: más reciente', takenOld: 'Fecha de la foto: más antigua', addedNew: 'Fecha de subida: más reciente', addedOld: 'Fecha de subida: más antigua' },
 	},
 
 	ja: {
@@ -213,5 +216,6 @@ export const dict: Record<Lang, Dict> = {
 			},
 		},
 		lightbox: { close: '閉じる', prev: '前の写真', next: '次の写真' },
+		sort: { label: '並べ替え', shuffle: 'ランダム', takenNew: '撮影日：新しい順', takenOld: '撮影日：古い順', addedNew: '追加日：新しい順', addedOld: '追加日：古い順' },
 	},
 };

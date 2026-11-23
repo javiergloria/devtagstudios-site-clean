@@ -5,6 +5,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Lightbox from './Lightbox.astro';
 import { shuffle } from '../utils/shuffle';
 import { dict, meta } from '../i18n/ui';
+import dates from '../data/photo-dates.json';
 import type { Lang } from '../i18n/ui';
 
 interface Props {
@@ -31,6 +32,9 @@ const photos = shuffle(
 );
 
 const text = dict[lang].galleries[pageKey];
+// Sorting by date is offered on galleries listed in FOLDERS of scripts/photo_dates.py (not urban yet).
+const sortable = pageKey !== 'urban-street';
+const photoDates = Object.fromEntries(photos.map((p) => [p, (dates as Record<string, [string | null, string]>)[p] ?? [null, null]]));
 ---
 
 <BaseLayout lang={lang} pageKey={pageKey} adult={pageKey === 'boudoir-portraits'} title={text.title} description={text.description}>
@@ -39,6 +43,6 @@ const text = dict[lang].galleries[pageKey];
 			<h1>{text.h1}</h1>
 			<p>{text.intro}</p>
 		</section>
-		<Lightbox photos={photos} subjects={text.subjects} details={text.details} labels={dict[lang].lightbox} sep={meta[lang].sep} />
+		<Lightbox photos={photos} subjects={text.subjects} details={text.details} labels={dict[lang].lightbox} sep={meta[lang].sep} dates={sortable ? photoDates : undefined} sortLabels={sortable ? dict[lang].sort : undefined} />
 	</main>
 </BaseLayout>
