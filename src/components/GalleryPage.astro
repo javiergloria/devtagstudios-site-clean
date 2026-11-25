@@ -6,6 +6,7 @@ import Lightbox from './Lightbox.astro';
 import { shuffle } from '../utils/shuffle';
 import { dict, meta } from '../i18n/ui';
 import dates from '../data/photo-dates.json';
+import config from '../data/site-config.json';
 import type { Lang } from '../i18n/ui';
 
 interface Props {
@@ -32,8 +33,10 @@ const photos = shuffle(
 );
 
 const text = dict[lang].galleries[pageKey];
-// Sorting by date is offered on galleries listed in FOLDERS of scripts/photo_dates.py (not urban yet).
-const sortable = pageKey !== 'urban-street';
+// Per-gallery settings live in src/data/site-config.json (edited with scripts/backoffice.py).
+const cfg = config.galleries[pageKey];
+// Sorting by date needs dates from scripts/photo_dates.py (photos without a date sort last).
+const sortable = cfg.showSort;
 const photoDates = Object.fromEntries(photos.map((p) => [p, (dates as Record<string, [string | null, string]>)[p] ?? [null, null]]));
 ---
 
@@ -43,6 +46,6 @@ const photoDates = Object.fromEntries(photos.map((p) => [p, (dates as Record<str
 			<h1>{text.h1}</h1>
 			<p>{text.intro}</p>
 		</section>
-		<Lightbox photos={photos} subjects={text.subjects} details={text.details} labels={dict[lang].lightbox} sep={meta[lang].sep} dates={sortable ? photoDates : undefined} sortLabels={sortable ? dict[lang].sort : undefined} mediaLabels={dict[lang].media} />
+		<Lightbox photos={photos} subjects={text.subjects} details={text.details} labels={dict[lang].lightbox} sep={meta[lang].sep} dates={sortable ? photoDates : undefined} sortLabels={sortable ? dict[lang].sort : undefined} mediaLabels={dict[lang].media} mediaToggle={cfg.mediaToggle as 'auto' | 'on' | 'off'} minVideos={config.videoToggleMinVideos} columns={cfg.columns} />
 	</main>
 </BaseLayout>

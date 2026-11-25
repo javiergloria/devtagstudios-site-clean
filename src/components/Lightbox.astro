@@ -21,6 +21,9 @@ const {
 	dates,
 	sortLabels,
 	mediaLabels,
+	mediaToggle = 'auto',
+	minVideos = 8,
+	columns = 0,
 } = Astro.props;
 const thumbFor = (src: string) => {
 	const dir = path.posix.dirname(src);
@@ -29,12 +32,12 @@ const thumbFor = (src: string) => {
 	return fs.existsSync(path.join(process.cwd(), 'public', rel)) ? rel : src;
 };
 const isVideo = (src: string) => /\.mp4$/i.test(src);
-// Photos/Videos switch: shown only once a gallery has this many videos.
-// TESTING: while SHOW_MEDIA_TOGGLE_TEST is true the switch shows with any video; set it to false to hide it until 8.
-const MIN_VIDEOS_FOR_TOGGLE = 8;
-const SHOW_MEDIA_TOGGLE_TEST = false;
+// Photos/Videos switch (settings: src/data/site-config.json): 'on' = whenever the gallery has a video,
+// 'auto' = only once it has `minVideos` videos, 'off' = never.
 const videoCount = photos.filter(isVideo).length;
-const showMediaToggle = !!mediaLabels && videoCount > 0 && (SHOW_MEDIA_TOGGLE_TEST || videoCount >= MIN_VIDEOS_FOR_TOGGLE);
+const showMediaToggle = !!mediaLabels && videoCount > 0 && (mediaToggle === 'on' || (mediaToggle === 'auto' && videoCount >= minVideos));
+// Fixed column count on desktop (0 = automatic); fewer columns on tablets and phones.
+const colStyle = columns > 0 ? `--cols:${columns};--cols-md:${Math.min(columns, 3)};--cols-sm:${Math.min(columns, 2)}` : undefined;
 const posterFor = (src: string) => {
 	const dir = path.posix.dirname(src);
 	const name = path.posix.basename(src).replace(/\.[^.]+$/, '');
@@ -64,7 +67,7 @@ const altFor = (i: number) =>
 	</div>
 )}
 
-<div class="gallery">
+<div class="gallery" data-cols={columns > 0 ? columns : undefined} style={colStyle}>
 	{photos.map((src, i) => isVideo(src) ? (
 		<span class="thumb-wrap">
 			<img
@@ -113,6 +116,15 @@ const altFor = (i: number) =>
 		grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
 		gap: 0.5rem;
 		padding-top: 1rem;
+	}
+	.gallery[data-cols] {
+		grid-template-columns: repeat(var(--cols), 1fr);
+	}
+	@media (max-width: 900px) {
+		.gallery[data-cols] { grid-template-columns: repeat(var(--cols-md), 1fr); }
+	}
+	@media (max-width: 560px) {
+		.gallery[data-cols] { grid-template-columns: repeat(var(--cols-sm), 1fr); }
 	}
 	.gallery-thumb {
 		width: 100%;

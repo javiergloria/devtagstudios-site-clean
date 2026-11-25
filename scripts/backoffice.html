@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devtag' Backoffice</title>
+<style>
+	:root {
+		--bg: #f6f6f4; --card: #fff; --ink: #1c1c1e; --muted: #6b6b70; --line: #e2e2dd;
+		--accent: #1c1c1e; --accent-ink: #fff; --ok: #1f8a4c; --warn: #b26a00; --err: #c0332b;
+	}
+	@media (prefers-color-scheme: dark) {
+		:root { --bg: #151517; --card: #202023; --ink: #f2f2f2; --muted: #9a9aa0; --line: #333338; --accent: #f2f2f2; --accent-ink: #151517; --ok: #4cc27f; --warn: #e0a040; --err: #ff7a70; }
+	}
+	* { box-sizing: border-box; }
+	body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+	header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 1rem; padding: 0.9rem 1.5rem; background: var(--card); border-bottom: 1px solid var(--line); }
+	header h1 { margin: 0; font-size: 1.1rem; flex: 1; }
+	header h1 small { font-weight: 400; color: var(--muted); margin-left: 0.5rem; }
+	#status { font-size: 0.85rem; color: var(--muted); }
+	#status.dirty { color: var(--warn); }
+	#status.saved { color: var(--ok); }
+	#status.error { color: var(--err); }
+	button { font: inherit; cursor: pointer; }
+	.btn { padding: 0.5rem 1.1rem; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+	.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+	.btn:disabled { opacity: 0.4; cursor: default; }
+	main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; display: grid; gap: 1.25rem; }
+	.grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); }
+	.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem; }
+	.card h2 { margin: 0 0 0.15rem; font-size: 1.05rem; }
+	.meta { color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem; }
+	.field { padding: 0.85rem 0; border-top: 1px solid var(--line); }
+	.field > label, .field > .lab { display: block; font-weight: 600; font-size: 0.9rem; }
+	.hint { color: var(--muted); font-size: 0.8rem; margin: 0.1rem 0 0.5rem; }
+	.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+	.seg button { border: none; background: transparent; color: var(--ink); padding: 0.4rem 0.8rem; border-right: 1px solid var(--line); }
+	.seg button:last-child { border-right: none; }
+	.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+	.preview { display: grid; gap: 3px; margin-top: 0.6rem; }
+	.preview i { display: block; aspect-ratio: 3 / 4; background: var(--line); border-radius: 2px; }
+	.global { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+	.global input { width: 4.5rem; font: inherit; padding: 0.35rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: var(--ink); }
+	.note { font-size: 0.85rem; color: var(--muted); }
+	.note b { color: var(--ink); }
+	.live { display: inline-block; margin-top: 0.4rem; font-size: 0.8rem; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid var(--line); }
+	.live.yes { color: var(--ok); border-color: var(--ok); }
+	.live.no { color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+	<h1>Devtag' Backoffice <small>gallery settings</small></h1>
+	<span id="status">Loading…</span>
+	<button class="btn" id="revert" disabled>Revert</button>
+	<button class="btn primary" id="save" disabled>Save</button>
+</header>
+<main>
+	<section class="card">
+		<div class="global">
+			<div>
+				<div class="lab" style="font-weight:600">Videos needed to show the Photos/Videos button</div>
+				<div class="hint">Used by every gallery set to “Auto”.</div>
+			</div>
+			<input id="minv" type="number" min="1" max="999" aria-label="Minimum videos">
+		</div>
+	</section>
+	<div class="grid" id="cards"></div>
+	<p class="note">Save writes <b>src/data/site-config.json</b> on this computer. Nothing goes live until you tell Claude: <b>“read the backoffice config and publish”</b>.</p>
+</main>
+<script>
+const NAMES = {
+	'beauty-glamour': 'Beauty & Glamour',
+	'boudoir-portraits': 'Boudoir Portraits',
+	'urban-street': 'Urban Street',
+};
+const MODES = [['auto', 'Auto'], ['on', 'Always on'], ['off', 'Off']];
+const COLS = [[0, 'Auto'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6']];
+let saved = null, state = null, counts = {};
+
+const $ = (s) => document.querySelector(s);
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const dirty = () => JSON.stringify(saved) !== JSON.stringify(state);
+
+function seg(options, value, onPick) {
+	const wrap = document.createElement('div');
+	wrap.className = 'seg';
+	options.forEach(([v, label]) => {
+		const b = document.createElement('button');
+		b.type = 'button';
+		b.textContent = label;
+		b.setAttribute('aria-pressed', String(v === value));
+		b.onclick = () => onPick(v);
+		wrap.appendChild(b);
+	});
+	return wrap;
+}
+
+function willShowToggle(g) {
+	const v = (counts[g] || {}).videos || 0;
+	const m = state.galleries[g].mediaToggle;
+	return v > 0 && (m === 'on' || (m === 'auto' && v >= state.videoToggleMinVideos));
+}
+
+function field(title, hint) {
+	const f = document.createElement('div');
+	f.className = 'field';
+	f.innerHTML = '<div class="lab"></div><div class="hint"></div>';
+	f.firstChild.textContent = title;
+	f.lastChild.textContent = hint;
+	return f;
+}
+
+function render() {
+	$('#minv').value = state.videoToggleMinVideos;
+	const cards = $('#cards');
+	cards.innerHTML = '';
+	for (const key of Object.keys(NAMES)) {
+		const g = state.galleries[key];
+		const c = counts[key] || { photos: 0, videos: 0 };
+		const card = document.createElement('section');
+		card.className = 'card';
+		card.innerHTML = '<h2></h2><div class="meta"></div>';
+		card.querySelector('h2').textContent = NAMES[key];
+		card.querySelector('.meta').textContent = `${c.photos} photos · ${c.videos} video${c.videos === 1 ? '' : 's'}`;
+
+		const f1 = field('Photos / Videos button', 'Auto shows it once the gallery has enough videos.');
+		f1.appendChild(seg(MODES, g.mediaToggle, (v) => { g.mediaToggle = v; update(); }));
+		const live = document.createElement('div');
+		const on = willShowToggle(key);
+		live.className = 'live ' + (on ? 'yes' : 'no');
+		live.textContent = on ? 'Button will show' : 'Button hidden';
+		f1.appendChild(live);
+
+		const f2 = field('Sort by dropdown', 'Shuffle, date taken, date added.' + (key === 'urban-street' ? ' Urban photos have no dates yet, so sorting by date does little there.' : ''));
+		f2.appendChild(seg([[true, 'Show'], [false, 'Hide']], g.showSort, (v) => { g.showSort = v; update(); }));
+
+		const f3 = field('Columns on desktop', 'Auto fits as many as the screen allows. Phones show at most 2, tablets 3.');
+		f3.appendChild(seg(COLS, g.columns, (v) => { g.columns = v; update(); }));
+		const prev = document.createElement('div');
+		prev.className = 'preview';
+		const n = g.columns || 4;
+		prev.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+		for (let i = 0; i < n * 2; i++) prev.appendChild(document.createElement('i'));
+		f3.appendChild(prev);
+
+		card.append(f1, f2, f3);
+		cards.appendChild(card);
+	}
+	setStatus();
+}
+
+function setStatus(msg, cls) {
+	const s = $('#status');
+	if (msg) { s.textContent = msg; s.className = cls || ''; }
+	else if (dirty()) { s.textContent = 'Unsaved changes'; s.className = 'dirty'; }
+	else { s.textContent = 'All changes saved'; s.className = 'saved'; }
+	$('#save').disabled = !dirty();
+	$('#revert').disabled = !dirty();
+}
+
+function update() { render(); }
+
+$('#minv').addEventListener('input', (e) => {
+	const v = parseInt(e.target.value, 10);
+	if (v >= 1 && v <= 999) { state.videoToggleMinVideos = v; render(); $('#minv').focus(); }
+});
+
+$('#revert').onclick = () => { state = clone(saved); render(); };
+
+$('#save').onclick = async () => {
+	setStatus('Saving…');
+	try {
+		const r = await fetch('/api/config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state) });
+		const j = await r.json();
+		if (!r.ok) throw new Error(j.error || 'save failed');
+		saved = clone(j.config); state = clone(j.config);
+		render();
+		setStatus('Saved to site-config.json. Tell Claude to publish.', 'saved');
+	} catch (e) {
+		setStatus('Error: ' + e.message, 'error');
+	}
+};
+
+window.addEventListener('beforeunload', (e) => { if (dirty()) { e.preventDefault(); e.returnValue = ''; } });
+
+fetch('/api/config').then((r) => r.json()).then((j) => {
+	saved = clone(j.config); state = clone(j.config); counts = j.counts;
+	render();
+}).catch(() => setStatus('Cannot reach the backoffice server. Run: python3 scripts/backoffice.py', 'error'));
+</script>
+</body>
+</html>
