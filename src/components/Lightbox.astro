@@ -36,8 +36,8 @@ const isVideo = (src: string) => /\.mp4$/i.test(src);
 // 'auto' = only once it has `minVideos` videos, 'off' = never.
 const videoCount = photos.filter(isVideo).length;
 const showMediaToggle = !!mediaLabels && videoCount > 0 && (mediaToggle === 'on' || (mediaToggle === 'auto' && videoCount >= minVideos));
-// Fixed column count on desktop (0 = automatic); fewer columns on tablets and phones.
-const colStyle = columns > 0 ? `--cols:${columns};--cols-md:${Math.min(columns, 3)};--cols-sm:${Math.min(columns, 2)}` : undefined;
+// Fixed column count on desktop only (0 = automatic). Tablets always show 3 columns and phones 2.
+const colStyle = columns > 0 ? `--cols:${columns}` : undefined;
 const posterFor = (src: string) => {
 	const dir = path.posix.dirname(src);
 	const name = path.posix.basename(src).replace(/\.[^.]+$/, '');
@@ -117,14 +117,14 @@ const altFor = (i: number) =>
 		gap: 0.5rem;
 		padding-top: 1rem;
 	}
-	.gallery[data-cols] {
-		grid-template-columns: repeat(var(--cols), 1fr);
+	@media (min-width: 901px) {
+		.gallery[data-cols] { grid-template-columns: repeat(var(--cols), 1fr); }
 	}
 	@media (max-width: 900px) {
-		.gallery[data-cols] { grid-template-columns: repeat(var(--cols-md), 1fr); }
+		.gallery { grid-template-columns: repeat(3, 1fr); }
 	}
 	@media (max-width: 560px) {
-		.gallery[data-cols] { grid-template-columns: repeat(var(--cols-sm), 1fr); }
+		.gallery { grid-template-columns: repeat(2, 1fr); }
 	}
 	.gallery-thumb {
 		width: 100%;

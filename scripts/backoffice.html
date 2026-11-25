@@ -135,7 +135,7 @@ function render() {
 		const f2 = field('Sort by dropdown', 'Shuffle, date taken, date added.' + (key === 'urban-street' ? ' Urban photos have no dates yet, so sorting by date does little there.' : ''));
 		f2.appendChild(seg([[true, 'Show'], [false, 'Hide']], g.showSort, (v) => { g.showSort = v; update(); }));
 
-		const f3 = field('Columns on desktop', 'Auto fits as many as the screen allows. Phones show at most 2, tablets 3.');
+		const f3 = field('Columns on desktop', 'Desktop only. Auto fits as many as the screen allows. Tablets always show 3 and phones 2.');
 		f3.appendChild(seg(COLS, g.columns, (v) => { g.columns = v; update(); }));
 		const prev = document.createElement('div');
 		prev.className = 'preview';
