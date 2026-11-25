@@ -1,8 +1,20 @@
 {
   "videoToggleMinVideos": 8,
   "galleries": {
-    "beauty-glamour": { "mediaToggle": "auto", "showSort": true, "columns": 0 },
-    "boudoir-portraits": { "mediaToggle": "auto", "showSort": true, "columns": 0 },
-    "urban-street": { "mediaToggle": "auto", "showSort": false, "columns": 0 }
+    "beauty-glamour": {
+      "mediaToggle": "auto",
+      "showSort": true,
+      "columns": 4
+    },
+    "boudoir-portraits": {
+      "mediaToggle": "auto",
+      "showSort": true,
+      "columns": 6
+    },
+    "urban-street": {
+      "mediaToggle": "auto",
+      "showSort": false,
+      "columns": 3
+    }
   }
 }
