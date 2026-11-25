@@ -28,6 +28,12 @@ const thumbFor = (src: string) => {
 	return fs.existsSync(path.join(process.cwd(), 'public', rel)) ? rel : src;
 };
 const isVideo = (src: string) => /\.mp4$/i.test(src);
+// Photos/Videos switch: shown only once a gallery has this many videos.
+// TESTING: while SHOW_MEDIA_TOGGLE_TEST is true the switch shows with any video; set it to false to hide it until 8.
+const MIN_VIDEOS_FOR_TOGGLE = 8;
+const SHOW_MEDIA_TOGGLE_TEST = true;
+const videoCount = photos.filter(isVideo).length;
+const showMediaToggle = !!mediaLabels && videoCount > 0 && (SHOW_MEDIA_TOGGLE_TEST || videoCount >= MIN_VIDEOS_FOR_TOGGLE);
 const posterFor = (src: string) => {
 	const dir = path.posix.dirname(src);
 	const name = path.posix.basename(src).replace(/\.[^.]+$/, '');
@@ -37,16 +43,23 @@ const altFor = (i: number) =>
 	`${subjects[i % subjects.length]}${sep}${details[(i * 7 + 3) % details.length]}`;
 ---
 
-{sortLabels && (
+{(sortLabels || showMediaToggle) && (
 	<div class="sort-bar">
-		<label for="gallery-sort">{sortLabels.label}</label>
-		<select id="gallery-sort">
-			<option value="shuffle" selected>{sortLabels.shuffle}</option>
-			<option value="taken-new">{sortLabels.takenNew}</option>
-			<option value="taken-old">{sortLabels.takenOld}</option>
-			<option value="added-new">{sortLabels.addedNew}</option>
-			<option value="added-old">{sortLabels.addedOld}</option>
-		</select>
+		{showMediaToggle && mediaLabels && (
+			<button type="button" id="media-toggle" class="media-toggle" data-videos={mediaLabels.videos} data-photos={mediaLabels.photos}>{mediaLabels.videos}</button>
+		)}
+		{sortLabels && (
+			<>
+				<label for="gallery-sort">{sortLabels.label}</label>
+				<select id="gallery-sort">
+					<option value="shuffle" selected>{sortLabels.shuffle}</option>
+					<option value="taken-new">{sortLabels.takenNew}</option>
+					<option value="taken-old">{sortLabels.takenOld}</option>
+					<option value="added-new">{sortLabels.addedNew}</option>
+					<option value="added-old">{sortLabels.addedOld}</option>
+				</select>
+			</>
+		)}
 	</div>
 )}
 
@@ -118,6 +131,21 @@ const altFor = (i: number) =>
 		font-size: 0.9rem;
 		color: var(--brand-color, #555);
 	}
+	.media-toggle {
+		margin-right: auto;
+		font: inherit;
+		font-weight: 600;
+		color: inherit;
+		background: transparent;
+		border: none;
+		padding: 0.25rem 0;
+		cursor: pointer;
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+	}
+	.media-toggle:hover {
+		opacity: 0.75;
+	}
 	.sort-bar select {
 		font: inherit;
 		color: inherit;
@@ -133,6 +161,10 @@ const altFor = (i: number) =>
 	.thumb-wrap {
 		position: relative;
 		display: block;
+	}
+	.thumb-wrap[hidden],
+	.gallery-thumb[hidden] {
+		display: none;
 	}
 	.play-badge {
 		position: absolute;
@@ -321,7 +353,8 @@ const altFor = (i: number) =>
 
 <script>
 	function initLightbox() {
-		let thumbs = Array.from(document.querySelectorAll<HTMLImageElement>('.gallery-thumb'));
+		const allThumbs = Array.from(document.querySelectorAll<HTMLImageElement>('.gallery-thumb'));
+			let thumbs = allThumbs.slice(); // thumbs currently visible (used by the lightbox)
 		const lightbox = document.getElementById('lightbox');
 		if (!lightbox || thumbs.length === 0) return;
 
@@ -425,7 +458,7 @@ const altFor = (i: number) =>
 			document.body.style.overflow = '';
 		}
 
-		thumbs.forEach((thumb) => {
+		allThumbs.forEach((thumb) => {
 			thumb.addEventListener('click', () => open(thumbs.indexOf(thumb)));
 		});
 
@@ -436,7 +469,7 @@ const altFor = (i: number) =>
 			const unit = (t: HTMLImageElement) => (t.parentElement!.classList.contains('thumb-wrap') ? t.parentElement! : t);
 			sortSel.addEventListener('change', () => {
 				const mode = sortSel.value;
-				const items = thumbs.slice();
+				const items = allThumbs.slice();
 				if (mode === 'shuffle') {
 					for (let i = items.length - 1; i > 0; i--) {
 						const j = Math.floor(Math.random() * (i + 1));
@@ -455,9 +488,31 @@ const altFor = (i: number) =>
 					});
 				}
 				items.forEach((t) => grid.appendChild(unit(t)));
-				thumbs = items;
+				allThumbs.splice(0, allThumbs.length, ...items);
+				applyView();
 			});
 		}
+
+		// Photos/Videos switch (only rendered when the gallery has enough videos). Without it, everything shows together.
+		const mediaBtn = document.getElementById('media-toggle') as HTMLButtonElement | null;
+		let view: 'photos' | 'videos' | 'all' = mediaBtn ? 'photos' : 'all';
+		function applyView() {
+			allThumbs.forEach((t) => {
+				const wrap = t.parentElement!.classList.contains('thumb-wrap') ? t.parentElement! : t;
+				const isVid = !!t.dataset.video;
+				(wrap as HTMLElement).hidden = view === 'photos' ? isVid : view === 'videos' ? !isVid : false;
+			});
+			thumbs = allThumbs.filter((t) => !(t.parentElement!.classList.contains('thumb-wrap') ? t.parentElement! : t).hidden);
+		}
+		if (mediaBtn) {
+			mediaBtn.textContent = mediaBtn.dataset.videos || '';
+			mediaBtn.addEventListener('click', () => {
+				view = view === 'photos' ? 'videos' : 'photos';
+				mediaBtn.textContent = (view === 'photos' ? mediaBtn.dataset.videos : mediaBtn.dataset.photos) || '';
+				applyView();
+			});
+		}
+		applyView();
 
 		closeBtn.addEventListener('click', close);
 		backdrop.addEventListener('click', close);

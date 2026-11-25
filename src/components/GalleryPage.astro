@@ -43,6 +43,6 @@ const photoDates = Object.fromEntries(photos.map((p) => [p, (dates as Record<str
 			<h1>{text.h1}</h1>
 			<p>{text.intro}</p>
 		</section>
-		<Lightbox photos={photos} subjects={text.subjects} details={text.details} labels={dict[lang].lightbox} sep={meta[lang].sep} dates={sortable ? photoDates : undefined} sortLabels={sortable ? dict[lang].sort : undefined} />
+		<Lightbox photos={photos} subjects={text.subjects} details={text.details} labels={dict[lang].lightbox} sep={meta[lang].sep} dates={sortable ? photoDates : undefined} sortLabels={sortable ? dict[lang].sort : undefined} mediaLabels={dict[lang].media} />
 	</main>
 </BaseLayout>
