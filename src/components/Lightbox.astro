@@ -32,7 +32,7 @@ const isVideo = (src: string) => /\.mp4$/i.test(src);
 // Photos/Videos switch: shown only once a gallery has this many videos.
 // TESTING: while SHOW_MEDIA_TOGGLE_TEST is true the switch shows with any video; set it to false to hide it until 8.
 const MIN_VIDEOS_FOR_TOGGLE = 8;
-const SHOW_MEDIA_TOGGLE_TEST = true;
+const SHOW_MEDIA_TOGGLE_TEST = false;
 const videoCount = photos.filter(isVideo).length;
 const showMediaToggle = !!mediaLabels && videoCount > 0 && (SHOW_MEDIA_TOGGLE_TEST || videoCount >= MIN_VIDEOS_FOR_TOGGLE);
 const posterFor = (src: string) => {
