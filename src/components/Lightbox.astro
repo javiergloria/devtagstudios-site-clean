@@ -117,14 +117,20 @@ const altFor = (i: number) =>
 		gap: 0.5rem;
 		padding-top: 1rem;
 	}
+	/* Fixed columns use flex so an incomplete last row is centered (a grid would left-align it).
+	   --n = columns per row; tablets always 3, phones always 2, desktop from site-config.json. */
+	.gallery > * {
+		flex: 0 0 calc((100% - (var(--n, 1) - 1) * 0.5rem) / var(--n, 1));
+		min-width: 0;
+	}
 	@media (min-width: 901px) {
-		.gallery[data-cols] { grid-template-columns: repeat(var(--cols), 1fr); }
+		.gallery[data-cols] { display: flex; flex-wrap: wrap; justify-content: center; --n: var(--cols); }
 	}
 	@media (max-width: 900px) {
-		.gallery { grid-template-columns: repeat(3, 1fr); }
+		.gallery { display: flex; flex-wrap: wrap; justify-content: center; --n: 3; }
 	}
 	@media (max-width: 560px) {
-		.gallery { grid-template-columns: repeat(2, 1fr); }
+		.gallery { --n: 2; }
 	}
 	.gallery-thumb {
 		width: 100%;
